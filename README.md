@@ -73,7 +73,6 @@ Hydra-SOC/
 │   └── active-response/
 ├── attacks/
 │   ├── ssh-brute-force.md
-│   ├── network-reconnaissance.md
 │   ├── suspicious-command-execution.md
 │   └── file-integrity-monitoring.md
 └── .gitignore
