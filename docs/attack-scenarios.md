@@ -23,6 +23,17 @@ Detect repeated SSH authentication failures and evaluate Wazuh's ability to iden
 
 Hydra was used to generate repeated SSH authentication attempts against the Ubuntu victim machine in the lab environment.
 
+```bash
+hydra -l <TEST_USERNAME> -P <PASSWORD_LIST> ssh://<VICTIM_IP> -t 2
+```
+
+**Command parameters:**
+
+* `-l`: Specifies the username being tested.
+* `-P`: Specifies the password list.
+* `ssh://`: Identifies SSH as the target service.
+* `-t 2`: Uses two parallel task threads.
+
 ### 📥 Log Collection
 
 * **Log source:** `/var/log/auth.log`
@@ -38,13 +49,29 @@ Wazuh analyzes SSH authentication events to identify failed login attempts and r
 * **Rule ID `5760`:** SSH authentication failure detection.
 * **Rule ID `5763`:** SSH brute-force detection and correlation in the tested environment.
 
+Rule `5763` uses the following correlation conditions:
+
+| Setting            | Value               |
+| ------------------ | ------------------- |
+| Frequency          | 8 events            |
+| Time window        | 120 seconds         |
+| Source IP matching | Same source IP      |
+| Ignore period      | 60 seconds          |
+| MITRE ATT&CK       | T1110 — Brute Force |
+
 Correlation of repeated authentication failures helps identify suspicious login activity that may not be apparent from a single failed attempt.
 
 ### 🛡️ Automated Response
 
-Wazuh Active Response was configured and tested as part of the SSH brute-force scenario. The team confirmed that the attacker's source IP address was blocked.
+Wazuh Active Response was configured to execute `firewall-drop` when rule `5763` triggers.
 
-This demonstrated the integration of security detection and automated response within the lab environment.
+* **Response command:** `firewall-drop`
+* **Execution location:** `local`
+* **Block timeout:** 180 seconds
+
+Testing confirmed that Active Response blocked the attacker's source IP address.
+
+The detailed log collection, detection, correlation, and Active Response configuration is documented in [`wazuh/rules/ssh-brute-force.md`](../wazuh/rules/ssh-brute-force.md).
 
 ---
 
@@ -56,13 +83,21 @@ Detect selected Linux commands that may be used to gather system information dur
 
 ### 🧪 Test Commands
 
-The following commands were executed during testing:
+An SSH connection was established to the Ubuntu victim machine:
 
-* `whoami`
-* `hostname`
-* `id`
-* `uname -a`
-* `ip address`
+```bash
+ssh <TEST_USERNAME>@<VICTIM_IP>
+```
+
+The following commands were then executed within the SSH session:
+
+```bash
+whoami
+id
+uname -a
+hostname
+ip addr
+```
 
 These commands are legitimate system utilities. Their execution alone does not establish malicious intent, but monitoring their execution can provide useful context when investigating suspicious activity.
 
@@ -99,6 +134,34 @@ Subsequent testing confirmed that the false-positive issue was resolved, improvi
 
 Monitor selected files on the Ubuntu victim machine and detect changes that may indicate unauthorized or unexpected modifications.
 
+### 🧪 Test Operations
+
+The following operations were performed on a test file inside the monitored directory:
+
+`/home/<TEST_USERNAME>/<MONITORED_DIRECTORY>/`
+
+**Create a file:**
+
+```bash
+touch /home/<TEST_USERNAME>/<MONITORED_DIRECTORY>/test-file.txt
+```
+
+**Modify the file:**
+
+```bash
+echo "Test modification" >> /home/<TEST_USERNAME>/<MONITORED_DIRECTORY>/test-file.txt
+```
+
+**Delete the file:**
+
+```bash
+rm /home/<TEST_USERNAME>/<MONITORED_DIRECTORY>/test-file.txt
+```
+
+These operations test file creation, modification, and deletion within the monitored directory.
+
+If a permission error occurs, `sudo` may be used where necessary, provided the account is authorized to perform the operation.
+
 ### 🔎 Monitoring Mechanism
 
 Wazuh File Integrity Monitoring monitors configured files and directories for changes to their integrity.
@@ -121,33 +184,32 @@ Correlate related security events to identify suspicious activity and connect de
 
 The SSH brute-force scenario demonstrates how repeated authentication failures can be evaluated together rather than treated as isolated events.
 
-Wazuh correlation rules use configured conditions, such as event frequency and time windows, to identify repeated activity that meets the detection criteria.
+Wazuh rule `5763` correlates repeated SSH authentication failures using the configured event frequency, time window, and source IP conditions.
+
+When the rule triggers, the associated Active Response executes `firewall-drop` according to the configured response settings.
 
 ### 🛡️ Incident Response
 
-Wazuh Active Response was tested in conjunction with SSH brute-force detection.
+During SSH brute-force testing, the team confirmed that Active Response blocked the attacker's source IP address.
 
-After the detection and response process was triggered, the team confirmed that the attacker's source IP address was blocked.
-
-This demonstrated the connection between event monitoring, correlation, alert generation, and automated response in the Hydra SOC environment.
+This demonstrated the connection between endpoint monitoring, event correlation, alert generation, and automated response in the Hydra SOC environment.
 
 ---
+
 ## 🔒 Security Considerations
 
 * 🧪 All attack simulations were performed in the project's lab environment.
-* 🔐 Sensitive information, including credentials and private IP addresses, is excluded from published configurations and evidence.
+* 🔐 Credentials, access tokens, private keys, and unnecessary infrastructure details are excluded from published configurations and evidence.
 * 🛠️ Custom detection rules were tested and tuned to reduce false-positive alerts.
-
-
+* 🎯 System-discovery commands and file operations were performed as controlled tests in the lab.
 
 ---
 
 ## 🏁 Summary
 
-Hydra SOC demonstrates a practical approach to security monitoring and incident response using Wazuh, Ubuntu, and Linux audit telemetry.
+Hydra SOC uses Wazuh, Ubuntu, and Linux audit telemetry to demonstrate threat detection, event correlation, File Integrity Monitoring, and automated incident response.
 
-The project covers SSH brute-force detection and automated response, suspicious system-discovery command detection, File Integrity Monitoring, and event correlation.
+### 🛡️ Collect. Detect. Investigate. Respond.
 
-These scenarios illustrate how endpoint telemetry, detection rules, correlation logic, and automated response can work together to support security monitoring and investigation.
 
 ### 🛡️ Collect. Detect. Investigate. Respond.
