@@ -1,0 +1,11 @@
+<group name="local,audit,suspicious_command,">
+
+  <rule id="100200" level="8">
+    <if_sid>80700</if_sid>
+    <field name="audit.type">EXECVE</field>
+    <match>whoami|hostname|id|uname|ip</match>
+    <description>Suspicious system discovery command executed</description>
+    <group>audit_command,suspicious_command,</group>
+  </rule>
+
+</group>
