@@ -4,9 +4,9 @@
 
 ## 📌 Overview
 
-**Hydra SOC** is a hands-on Security Operations Center (SOC) project designed to demonstrate how security events can be collected, monitored, analyzed, and detected in a controlled lab environment.
+Hydra SOC is a hands-on Security Operations Center (SOC) project designed to demonstrate how security events can be collected, monitored, analyzed, and detected in a controlled lab environment.
 
-The project uses **Wazuh** as its primary security monitoring and detection platform. It brings together attack simulation, endpoint monitoring, custom detection rules, event correlation, and incident response to demonstrate key SOC workflows.
+The project uses Wazuh as its primary security monitoring and detection platform. It brings together attack simulation, endpoint monitoring, custom detection rules, event correlation, and incident response to demonstrate key SOC workflows.
 
 ## 🎯 Project Objectives
 
@@ -35,6 +35,8 @@ The lab is organized around three main roles:
 * **Wazuh Indexer:** Stores and indexes security data for searching and analysis.
 * **Wazuh Dashboard:** Provides a visual interface for monitoring and investigating security alerts.
 
+For more details, see [System Architecture](docs/architecture.md).
+
 ## 🔍 Attack Scenarios
 
 The project explores the following security use cases:
@@ -44,7 +46,7 @@ The project explores the following security use cases:
 3. **File Integrity Monitoring (FIM)** — Monitoring selected files and detecting changes.
 4. **Event Correlation and Incident Response** — Exploring how related events can trigger higher-priority alerts and, where configured and verified, automated responses.
 
-> Detection and response results are documented according to the tests actually completed in the lab.
+See [Attack Scenarios](docs/attack-scenarios.md) for details.
 
 ## 🛠️ Technologies
 
@@ -65,20 +67,30 @@ Hydra-SOC/
 ├── README.md
 ├── docs/
 │   ├── architecture.md
-│   ├── attack-scenarios.md
-│   └── screenshots/
-├── wazuh/
-│   ├── rules/
-│   ├── agent-config/
-│   └── active-response/
-├── attacks/
-│   ├── ssh-brute-force.md
-│   ├── suspicious-command-execution.md
-│   └── file-integrity-monitoring.md
-└── .gitignore
+│   └── attack-scenarios.md
+└── wazuh/
+    ├── rules/
+    │   ├── README.md
+    │   ├── suspicious-command.xml
+    │   └── ssh-brute-force.md
+    ├── agent-config/
+    │   └── README.md
+    └── active-response/
+        └── README.md
 ```
 
-*The structure above describes the planned documentation and configuration layout; files will be added as they are prepared.*
+### 📚 Documentation
+
+* [Architecture](docs/architecture.md)
+* [Attack Scenarios](docs/attack-scenarios.md)
+
+### ⚙️ Wazuh Configuration
+
+* [Detection Rules](wazuh/rules/README.md)
+* [Suspicious Command Rule](wazuh/rules/suspicious-command.xml)
+* [SSH Brute-Force Detection](wazuh/rules/ssh-brute-force.md)
+* [Agent Configuration](wazuh/agent-config/README.md)
+* [Active Response](wazuh/active-response/README.md)
 
 ## 🔐 Scope and Safety
 
