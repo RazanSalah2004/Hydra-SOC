@@ -1,3 +1,4 @@
+
 # Hydra SOC 🛡️
 
 ### A Practical Security Operations Center Using Wazuh
